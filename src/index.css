@@ -1,0 +1,158 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --mx: 50%;
+    --my: 50%;
+  }
+  html {
+    background: #08070f;
+    color-scheme: dark;
+  }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: #08070f;
+    color: #f7f3e8;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  @media (max-width: 768px) {
+    body {
+      cursor: auto;
+    }
+  }
+  ::selection {
+    background: rgba(255, 46, 136, 0.4);
+    color: #f7f3e8;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .perspective-1000 { perspective: 1000px; }
+  .perspective-1400 { perspective: 1400px; }
+  .preserve-3d { transform-style: preserve-3d; }
+  .backface-hidden { backface-visibility: hidden; }
+
+  /* 3D extruded title — a stack of receding shadows behind the foreground
+     text gives a depth effect without WebGL. Layers fade toward `void`. */
+  .extrude {
+    color: #f7f3e8;
+    text-shadow:
+      1px 1px 0 #2a2348,
+      2px 2px 0 #2a2348,
+      3px 3px 0 #1a1530,
+      4px 4px 0 #1a1530,
+      5px 5px 0 #14112a,
+      6px 6px 0 #14112a,
+      7px 7px 0 #0d0b1a,
+      8px 8px 0 #0d0b1a,
+      10px 10px 30px rgba(255, 46, 136, 0.25),
+      20px 20px 60px rgba(30, 233, 255, 0.15);
+  }
+
+  /* Spotlight that follows the cursor — drops as a pseudo-element on a
+     containing element with `position: relative`. Driven by --mx, --my. */
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      600px circle at var(--mx) var(--my),
+      rgba(255, 46, 136, 0.10),
+      transparent 50%
+    );
+    opacity: 0.9;
+    z-index: 1;
+  }
+
+  /* Grain — fine static noise that masks Tailwind gradient banding. */
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+    z-index: 2;
+  }
+
+  /* Iridescent gradient text */
+  .iridescent {
+    background: linear-gradient(
+      120deg,
+      #ff2e88 0%,
+      #c4ff3d 35%,
+      #1ee9ff 65%,
+      #ff2e88 100%
+    );
+    background-size: 200% 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: shimmer 9s ease-in-out infinite;
+  }
+  @keyframes shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Tilt cards — set --rx and --ry from JS, the element rotates in 3D. */
+  .tilt {
+    transform: rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)) translateZ(0);
+    transition: transform 220ms cubic-bezier(.2,.8,.2,1);
+    transform-style: preserve-3d;
+  }
+  .tilt > * { transform: translateZ(20px); transform-style: preserve-3d; }
+  .tilt .lift-30 { transform: translateZ(30px); }
+  .tilt .lift-50 { transform: translateZ(50px); }
+  .tilt .lift-80 { transform: translateZ(80px); }
+
+  /* No-scrollbar on horizontal showcase rails */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+
+/* Magnetic cursor */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 9999px;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: #f7f3e8;
+  transform: translate(-50%, -50%);
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #f7f3e8;
+  transform: translate(-50%, -50%);
+  transition: width 200ms, height 200ms, border-color 200ms;
+}
+.cursor-ring.is-hover {
+  width: 72px;
+  height: 72px;
+  border-color: #ff2e88;
+}
+@media (max-width: 768px) {
+  .cursor-dot, .cursor-ring { display: none; }
+}
