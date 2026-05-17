@@ -181,15 +181,17 @@ export default function Anatomy({ frames }) {
       aria-label="Mouse disassembly scroll sequence"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-deep perspective-1400">
-        {/* Decorative parallax orbs */}
+        {/* Static atmospheric backdrop. The previous version had a rotating
+            700px conic-gradient with blur-3xl whose transform updated on
+            every scroll tick — that was a 0.6-megapixel filter pass per
+            paint, the biggest contributor to scroll lag in this section. */}
         <div
           aria-hidden
-          className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full opacity-20 blur-3xl pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'conic-gradient(from 0deg, #ff2e88, #1ee9ff, #c4ff3d, #ff2e88)',
-            transform: `translate3d(-50%, 0, 0) rotate(${progress * 360}deg)`,
-            transition: 'transform 200ms linear',
+              'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(255,46,136,0.10), transparent 60%),' +
+              'radial-gradient(ellipse 60% 50% at 50% 100%, rgba(30,233,255,0.08), transparent 65%)',
           }}
         />
 
@@ -282,7 +284,7 @@ function Card({ card, opacity, progress }) {
   return (
     <article
       data-cursor="hover"
-      className={`absolute max-w-[280px] rounded-2xl border ${a.border} bg-void/70 backdrop-blur-xl p-5 z-10 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)]`}
+      className={`absolute max-w-[280px] rounded-2xl border ${a.border} bg-void/70 backdrop-blur-md p-5 z-10 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)]`}
       style={{
         ...card.pos,
         opacity,

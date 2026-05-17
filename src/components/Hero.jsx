@@ -4,54 +4,56 @@ export default function Hero() {
   const heroRef = useRef(null);
   const titleRef = useRef(null);
 
-  // Subtle parallax of the title with the cursor — moves a few pixels.
+  // Cursor parallax for the title — rAF-throttled. Previously this wrote
+  // to .style.transform on every mousemove event which was 60-120 layout
+  // mutations per second + caused composite invalidations on a huge
+  // text-shadow stack.
   useEffect(() => {
-    const onMove = (e) => {
-      const t = titleRef.current;
-      if (!t) return;
-      const dx = (e.clientX / window.innerWidth - 0.5) * 18;
-      const dy = (e.clientY / window.innerHeight - 0.5) * 10;
-      t.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+    const t = titleRef.current;
+    if (!t) return;
+    let target = { x: 0, y: 0 };
+    let current = { x: 0, y: 0 };
+    let raf = 0;
+
+    const tick = () => {
+      raf = 0;
+      current.x += (target.x - current.x) * 0.12;
+      current.y += (target.y - current.y) * 0.12;
+      t.style.transform = `translate3d(${current.x.toFixed(2)}px, ${current.y.toFixed(2)}px, 0)`;
+      if (Math.hypot(target.x - current.x, target.y - current.y) > 0.1) {
+        raf = requestAnimationFrame(tick);
+      }
     };
-    window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
+    const onMove = (e) => {
+      target.x = (e.clientX / window.innerWidth - 0.5) * 18;
+      target.y = (e.clientY / window.innerHeight - 0.5) * 10;
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
     <section
       ref={heroRef}
       id="top"
-      className="relative min-h-[100svh] overflow-hidden spotlight grain"
+      className="relative min-h-[100svh] overflow-hidden grain"
     >
-      {/* Cosmic backdrop */}
+      {/* Static cosmic backdrop — no animations, just a layered radial
+          gradient. Was previously fighting with rotating conic+blur sigils
+          which forced full-screen GPU work every frame. */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10"
         style={{
           background:
-            'radial-gradient(ellipse 60% 50% at 18% 12%, rgba(255,46,136,0.18), transparent 60%),' +
-            'radial-gradient(ellipse 50% 60% at 82% 88%, rgba(30,233,255,0.16), transparent 65%),' +
-            'radial-gradient(ellipse 100% 80% at 50% 50%, rgba(196,255,61,0.04), transparent 70%),' +
+            'radial-gradient(ellipse 60% 50% at 18% 12%, rgba(255,46,136,0.22), transparent 60%),' +
+            'radial-gradient(ellipse 55% 60% at 82% 88%, rgba(30,233,255,0.18), transparent 65%),' +
+            'radial-gradient(ellipse 100% 80% at 50% 50%, rgba(196,255,61,0.05), transparent 70%),' +
             '#08070f',
-        }}
-      />
-
-      {/* Rotating gradient ring sigil — gives the page subtle motion */}
-      <div
-        aria-hidden
-        className="absolute -top-40 -left-40 w-[480px] h-[480px] rounded-full opacity-30 blur-3xl animate-spinSlow pointer-events-none"
-        style={{
-          background:
-            'conic-gradient(from 0deg, #ff2e88, #1ee9ff, #c4ff3d, #ff2e88)',
-        }}
-      />
-      <div
-        aria-hidden
-        className="absolute -bottom-40 -right-40 w-[520px] h-[520px] rounded-full opacity-25 blur-3xl animate-spinSlow pointer-events-none"
-        style={{
-          animationDirection: 'reverse',
-          background:
-            'conic-gradient(from 180deg, #1ee9ff, #ff2e88, #c4ff3d, #1ee9ff)',
         }}
       />
 

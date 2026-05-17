@@ -101,7 +101,7 @@ function FeatureRow({ feature, index }) {
         ref={ref}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
-        className={`tilt relative rounded-3xl border ${a.border} bg-gradient-to-br ${a.grad} bg-deep/60 backdrop-blur-xl p-10 md:p-12 min-h-[280px] ${a.glow} [direction:ltr]`}
+        className={`tilt relative rounded-3xl border ${a.border} bg-gradient-to-br ${a.grad} bg-deep/60 backdrop-blur-md p-10 md:p-12 min-h-[280px] ${a.glow} [direction:ltr]`}
         data-cursor="hover"
       >
         <div className="lift-30 absolute top-6 right-6 font-mono text-[11px] tracking-[0.4em] text-ash/60">

@@ -41,7 +41,7 @@ export default function CtaFooter() {
           </p>
         </div>
         <div className="md:justify-self-end w-full md:max-w-md">
-          <div className="rounded-3xl border border-white/[0.08] bg-deep/60 backdrop-blur-xl p-7">
+          <div className="rounded-3xl border border-white/[0.08] bg-deep/60 backdrop-blur-md p-7">
             <div className="flex items-baseline justify-between">
               <span className="font-mono text-[11px] uppercase tracking-[0.4em] text-ash">
                 Reserve a Vex · 03

@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --mx: 50%;
-    --my: 50%;
-  }
   html {
     background: #08070f;
     color-scheme: dark;
@@ -18,12 +14,6 @@
     background: #08070f;
     color: #f7f3e8;
     overflow-x: hidden;
-    cursor: none;
-  }
-  @media (max-width: 768px) {
-    body {
-      cursor: auto;
-    }
   }
   ::selection {
     background: rgba(255, 46, 136, 0.4);
@@ -38,37 +28,18 @@
   .preserve-3d { transform-style: preserve-3d; }
   .backface-hidden { backface-visibility: hidden; }
 
-  /* 3D extruded title — a stack of receding shadows behind the foreground
-     text gives a depth effect without WebGL. Layers fade toward `void`. */
+  /* 3D extruded title — receding shadows give a depth effect without
+     WebGL. Halved layer count from the original (10 → 5) and dropped the
+     soft drop-shadow glows, which were the expensive bits when the title
+     repaints during cursor parallax. */
   .extrude {
     color: #f7f3e8;
     text-shadow:
-      1px 1px 0 #2a2348,
       2px 2px 0 #2a2348,
-      3px 3px 0 #1a1530,
       4px 4px 0 #1a1530,
-      5px 5px 0 #14112a,
       6px 6px 0 #14112a,
-      7px 7px 0 #0d0b1a,
-      8px 8px 0 #0d0b1a,
-      10px 10px 30px rgba(255, 46, 136, 0.25),
-      20px 20px 60px rgba(30, 233, 255, 0.15);
-  }
-
-  /* Spotlight that follows the cursor — drops as a pseudo-element on a
-     containing element with `position: relative`. Driven by --mx, --my. */
-  .spotlight::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(
-      600px circle at var(--mx) var(--my),
-      rgba(255, 46, 136, 0.10),
-      transparent 50%
-    );
-    opacity: 0.9;
-    z-index: 1;
+      8px 8px 0 #0d0b1a;
+    will-change: transform;
   }
 
   /* Grain — fine static noise that masks Tailwind gradient banding. */
@@ -83,24 +54,19 @@
     z-index: 2;
   }
 
-  /* Iridescent gradient text */
+  /* Iridescent gradient text — static. Previously animated background-
+     position over 9s which forced the text to re-rasterize every frame.
+     With four instances on the page that was a measurable scroll cost. */
   .iridescent {
     background: linear-gradient(
       120deg,
       #ff2e88 0%,
-      #c4ff3d 35%,
-      #1ee9ff 65%,
-      #ff2e88 100%
+      #c4ff3d 45%,
+      #1ee9ff 100%
     );
-    background-size: 200% 200%;
     background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
-    animation: shimmer 9s ease-in-out infinite;
-  }
-  @keyframes shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
   }
 
   /* Tilt cards — set --rx and --ry from JS, the element rotates in 3D. */
@@ -124,7 +90,9 @@
   background: transparent;
 }
 
-/* Magnetic cursor */
+/* Magnetic cursor — opt-in via `body.has-custom-cursor`. The cursor adds
+   a `mousemove` rAF loop; cheap on its own, but anything that reads --mx
+   etc. globally was the real cost. Disabled on touch / small screens. */
 .cursor-dot,
 .cursor-ring {
   position: fixed;
@@ -134,18 +102,17 @@
   z-index: 9999;
   border-radius: 9999px;
   mix-blend-mode: difference;
+  will-change: transform;
 }
 .cursor-dot {
   width: 6px;
   height: 6px;
   background: #f7f3e8;
-  transform: translate(-50%, -50%);
 }
 .cursor-ring {
   width: 36px;
   height: 36px;
   border: 1px solid #f7f3e8;
-  transform: translate(-50%, -50%);
   transition: width 200ms, height 200ms, border-color 200ms;
 }
 .cursor-ring.is-hover {
@@ -153,6 +120,6 @@
   height: 72px;
   border-color: #ff2e88;
 }
-@media (max-width: 768px) {
+@media (max-width: 768px), (hover: none) {
   .cursor-dot, .cursor-ring { display: none; }
 }

@@ -18,7 +18,7 @@ export default function Nav() {
       }`}
     >
       <div
-        className={`mx-auto max-w-6xl flex items-center justify-between rounded-full px-5 py-2.5 backdrop-blur-xl border transition ${
+        className={`mx-auto max-w-6xl flex items-center justify-between rounded-full px-5 py-2.5 backdrop-blur-md border transition ${
           scrolled
             ? 'bg-void/70 border-white/[0.08]'
             : 'bg-white/[0.03] border-white/[0.05]'

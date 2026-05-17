@@ -16,18 +16,14 @@ export default function Cursor() {
     const ringEl = ringRef.current;
     if (!dot || !ringEl) return;
 
+    // Just capture the cursor position — don't publish CSS vars on every
+    // event. The previous version wrote to document.documentElement on every
+    // mousemove, which forced a global style recalc + repaint of any element
+    // reading var(--mx)/var(--my) (the spotlight pseudo-elements). Combined
+    // with the radial-gradient + blur stack that murdered scrolling.
     const onMove = (e) => {
       target.current.x = e.clientX;
       target.current.y = e.clientY;
-      // Also publish to CSS vars so spotlight + parallax can read them.
-      document.documentElement.style.setProperty(
-        '--mx',
-        ((e.clientX / window.innerWidth) * 100).toFixed(2) + '%'
-      );
-      document.documentElement.style.setProperty(
-        '--my',
-        ((e.clientY / window.innerHeight) * 100).toFixed(2) + '%'
-      );
       if (!rafRef.current) rafRef.current = requestAnimationFrame(loop);
     };
 
