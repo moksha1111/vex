@@ -4,7 +4,7 @@
 
 **[Live demo →](https://vex-hnfs.onrender.com)**
 
-![preview](docs/preview.mp4)
+<video src="docs/preview.mp4" controls autoplay loop muted playsinline width="100%"></video>
 
 ## What it does
 
